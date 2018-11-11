@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
 
     public SweetsPrefab[] sweetsPrefabs;
 
-    //single instance.
+    //Single Instance.
     private GameManager _instance;
     public GameManager Instance
     {
@@ -45,6 +45,9 @@ public class GameManager : MonoBehaviour {
     private int rows = 10;
 
     public GameObject gridPrefab;
+
+    //Sweets Array
+    private SweetsController[,] sweets;
 
     private void Awake()
     {
@@ -69,6 +72,19 @@ public class GameManager : MonoBehaviour {
             {
                 GameObject chocolate = Instantiate(gridPrefab, CalibratePosition(x, y), Quaternion.identity);
                 chocolate.transform.SetParent(transform);
+            }
+        }
+
+        sweets = new SweetsController[columns, rows];
+        for(int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                GameObject newSweet = Instantiate(sweetsPrefabDic[SweetsType.NORMAL], CalibratePosition(x, y), Quaternion.identity);
+                newSweet.transform.SetParent(transform);
+
+                sweets[x, y] = newSweet.GetComponent<SweetsController>();
+                sweets[x, y].Init(x, y, this, SweetsType.NORMAL);
             }
         }
 	}
