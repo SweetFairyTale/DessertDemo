@@ -79,12 +79,17 @@ public class GameManager : MonoBehaviour {
         for(int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
-            {
+            { 
                 GameObject newSweet = Instantiate(sweetsPrefabDic[SweetsType.NORMAL], CalibratePosition(x, y), Quaternion.identity);
                 newSweet.transform.SetParent(transform);
 
                 sweets[x, y] = newSweet.GetComponent<SweetsController>();
                 sweets[x, y].Init(x, y, this, SweetsType.NORMAL);
+
+                //if (sweets[x, y].Movable())
+                //{
+                //    sweets[x, y].MovedComponent.Move(x, y);  //test
+                //}
             }
         }
 	}

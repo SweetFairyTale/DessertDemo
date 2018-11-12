@@ -15,6 +15,7 @@ public class SweetsMovement : MonoBehaviour {
     {
         sweet.X = aimX;
         sweet.Y = aimY;
-        sweet.transform.localPosition = sweet.gameManager.CalibratePosition(aimX,aimY);
+        sweet.transform.position = sweet.gameManager.CalibratePosition(aimX,aimY);
     }
+
 }

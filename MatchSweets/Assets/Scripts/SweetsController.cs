@@ -53,6 +53,11 @@ public class SweetsController : MonoBehaviour
     [HideInInspector]
     public GameManager gameManager;
 
+    private void Awake()
+    {
+        movedComponent = GetComponent<SweetsMovement>();
+    }
+
     public void Init(int _x, int _y, GameManager _gameManager, GameManager.SweetsType _type)
     {
         x = _x;

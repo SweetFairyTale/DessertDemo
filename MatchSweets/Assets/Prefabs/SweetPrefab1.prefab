@@ -36,6 +36,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4796856875958478}
   - component: {fileID: 114689511540589830}
+  - component: {fileID: 114008061319944540}
   m_Layer: 0
   m_Name: SweetPrefab1
   m_TagString: Untagged
@@ -70,6 +71,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114008061319944540
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1826644776099512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 560757aa8a22b0f4e87a2bf3f83381d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114689511540589830
 MonoBehaviour:
   m_ObjectHideFlags: 1
