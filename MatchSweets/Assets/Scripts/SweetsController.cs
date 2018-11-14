@@ -50,12 +50,22 @@ public class SweetsController : MonoBehaviour
         }
     }
 
+    public SweetsColorType ColoredComponent
+    {
+        get
+        {
+            return coloredComponent;
+        }
+    }
+    private SweetsColorType coloredComponent;
+   
     [HideInInspector]
     public GameManager gameManager;
 
     private void Awake()
     {
         movedComponent = GetComponent<SweetsMovement>();
+        coloredComponent = GetComponent<SweetsColorType>();
     }
 
     public void Init(int _x, int _y, GameManager _gameManager, GameManager.SweetsType _type)
@@ -70,5 +80,10 @@ public class SweetsController : MonoBehaviour
     {
         //call in (XY)Setter.
         return movedComponent != null;
+    }
+
+    public bool ColorAble()
+    {
+        return coloredComponent != null;
     }
 }

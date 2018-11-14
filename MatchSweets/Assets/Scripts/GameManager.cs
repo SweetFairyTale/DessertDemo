@@ -90,6 +90,12 @@ public class GameManager : MonoBehaviour {
                 //{
                 //    sweets[x, y].MovedComponent.Move(x, y);  //test
                 //}
+
+                if (sweets[x, y].ColorAble())
+                {
+                    sweets[x, y].ColoredComponent.SetThisType(
+                        (SweetsColorType.ColorType)Random.Range(0, sweets[x, y].ColoredComponent.MaxColorsNum));
+                }
             }
         }
 	}

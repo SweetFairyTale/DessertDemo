@@ -27,9 +27,9 @@ public class SweetsColorType : MonoBehaviour {
 
     private Dictionary<ColorType, Sprite> colorSpirteDict;
 
-    private SpriteRenderer renderer;  //sprite
+    private SpriteRenderer sprite;  //sprite
 
-    public int MaxColorsNum   //后期限制随机数生成.
+    public int MaxColorsNum   //限制随机数生成.
     {
         get { return colorSprites.Length; }
     }
@@ -43,7 +43,7 @@ public class SweetsColorType : MonoBehaviour {
 
         set
         {
-            thisType = value;
+            SetThisType(value);
         }
 
     }
@@ -53,7 +53,7 @@ public class SweetsColorType : MonoBehaviour {
 
     private void Awake()
     {
-        renderer = transform.Find("Sweet").GetComponent<SpriteRenderer>();
+        sprite = transform.Find("Sweet").GetComponent<SpriteRenderer>();
         colorSpirteDict = new Dictionary<ColorType, Sprite>();
 
         for(int i = 0; i < colorSprites.Length; i++)
@@ -71,7 +71,7 @@ public class SweetsColorType : MonoBehaviour {
         thisType = color;
         if(colorSpirteDict.ContainsKey(color))
         {
-            renderer.sprite = colorSpirteDict[color];
+            sprite.sprite = colorSpirteDict[color];
         }
     }
 }
