@@ -79,35 +79,44 @@ public class GameManager : MonoBehaviour {
         for(int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
-            { 
-                GameObject newSweet = Instantiate(sweetsPrefabDic[SweetsType.NORMAL], CalibratePosition(x, y), Quaternion.identity);
-                newSweet.transform.SetParent(transform);
+            {
+                CreateNewSweet(x, y, SweetsType.EMPTY);
+                //GameObject newSweet = Instantiate(sweetsPrefabDic[SweetsType.NORMAL], CalibratePosition(x, y), Quaternion.identity);
+                //newSweet.transform.SetParent(transform);
 
-                sweets[x, y] = newSweet.GetComponent<SweetsController>();
-                sweets[x, y].Init(x, y, this, SweetsType.NORMAL);
+                //sweets[x, y] = newSweet.GetComponent<SweetsController>();
+                //sweets[x, y].Init(x, y, this, SweetsType.NORMAL);
 
                 //if (sweets[x, y].Movable())
                 //{
-                //    sweets[x, y].MovedComponent.Move(x, y);  //test
+                //    sweets[x, y].MovedComponent.Move(x, y);  //test(new Vector3.zero)
                 //}
 
-                if (sweets[x, y].ColorAble())
-                {
-                    sweets[x, y].ColoredComponent.SetThisType(
-                        (SweetsColorType.ColorType)Random.Range(0, sweets[x, y].ColoredComponent.MaxColorsNum));
-                }
+                //if (sweets[x, y].ColorAble())
+                //{
+                //    sweets[x, y].ColoredComponent.SetThisType(
+                //        (SweetsColorType.ColorType)Random.Range(0, sweets[x, y].ColoredComponent.MaxColorsNum));
+                //}
             }
         }
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public Vector3 CalibratePosition(int x, int y)
     {
         return new Vector3(transform.position.x - columns / 2f + x,
                            transform.position.y + rows / 2f - y);
+    }
+
+    //Create new Sweets Object.
+    public SweetsController CreateNewSweet(int x, int y, SweetsType type)
+    {
+        GameObject newSweet =
+        Instantiate(sweetsPrefabDic[type], CalibratePosition(x, y), Quaternion.identity);
+        newSweet.transform.parent = transform;
+
+        sweets[x, y] = newSweet.GetComponent<SweetsController>();
+        sweets[x, y].Init(x, y, this, type);
+        return sweets[x, y];
     }
 }
