@@ -119,4 +119,37 @@ public class GameManager : MonoBehaviour {
         sweets[x, y].Init(x, y, this, type);
         return sweets[x, y];
     }
+
+    //Fill all the grids with sweets.
+    public void FillAll()
+    {
+
+    }
+
+    public void Fill()
+    {
+        bool filledNotFinished = false;
+
+        for(int y = rows-2; y >= 0; y--)
+        {
+            for(int x = 0; x < columns; x++)
+            {
+                SweetsController sweet = sweets[x, y];
+
+                if(sweet.Movable())
+                {
+                    SweetsController sweetBelow = sweets[x, y + 1];
+
+                    if(sweetBelow.Type == SweetsType.EMPTY)
+                    {
+                        sweet.MovedComponent.Move(x, y + 1);
+                        sweets[x, y + 1] = sweet;
+                        CreateNewSweet(x, y, SweetsType.EMPTY);
+                        filledNotFinished = true;
+                    }
+                }
+            }
+        }
+
+    }
 }
