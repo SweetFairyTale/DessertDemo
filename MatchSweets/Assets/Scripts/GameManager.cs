@@ -99,6 +99,8 @@ public class GameManager : MonoBehaviour {
                 //}
             }
         }
+
+        //FillAll();
 	}
 	
 
@@ -123,13 +125,15 @@ public class GameManager : MonoBehaviour {
     //Fill all the grids with sweets.
     public void FillAll()
     {
-
+        while(Fill()){}
     }
 
-    public void Fill()
+    //Fill the grids one by one.
+    public bool Fill()
     {
         bool filledNotFinished = false;
 
+        //From bottom to top.
         for(int y = rows-2; y >= 0; y--)
         {
             for(int x = 0; x < columns; x++)
@@ -151,5 +155,25 @@ public class GameManager : MonoBehaviour {
             }
         }
 
+        //Exceptional case: the top row
+        for(int x = 0; x < rows; x++)
+        {
+            SweetsController sweet = sweets[x, 0];
+            if(sweet.Type == SweetsType.EMPTY)
+            {
+                GameObject newSweet = 
+                Instantiate(sweetsPrefabDic[SweetsType.NORMAL], CalibratePosition(x, -1), Quaternion.identity);
+                newSweet.transform.parent = transform;
+
+                sweets[x, 0] = newSweet.GetComponent<SweetsController>();
+                sweets[x, 0].Init(x, -1, this, SweetsType.NORMAL);
+                sweets[x, 0].MovedComponent.Move(x, 0);
+                sweets[x, 0].ColoredComponent.SetThisType(  //随机生成一种类型的甜品 **枚举为特殊的int**
+                    (SweetsColorType.ColorType)Random.Range(0, sweets[x, 0].ColoredComponent.MaxColorsNum));
+                filledNotFinished = true;
+            }
+        }
+        //Filling finished or not.
+        return filledNotFinished;
     }
 }
