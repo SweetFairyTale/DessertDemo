@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour {
     private int columns = 10;
     private int rows = 10;
 
+    private float fillTime = 0.2f;
+
     public GameObject gridPrefab;
 
     //Sweets Array
@@ -101,6 +103,7 @@ public class GameManager : MonoBehaviour {
         }
 
         //FillAll();
+        StartCoroutine(FillAll());
 	}
 	
 
@@ -123,9 +126,12 @@ public class GameManager : MonoBehaviour {
     }
 
     //Fill all the grids with sweets.
-    public void FillAll()
+    public IEnumerator FillAll()
     {
-        while(Fill()){}
+        while(Fill())
+        {
+            yield return new WaitForSeconds(fillTime);
+        }
     }
 
     //Fill the grids one by one.
@@ -146,7 +152,7 @@ public class GameManager : MonoBehaviour {
 
                     if(sweetBelow.Type == SweetsType.EMPTY)
                     {
-                        sweet.MovedComponent.Move(x, y + 1);
+                        sweet.MovedComponent.Move(x, y + 1, fillTime);
                         sweets[x, y + 1] = sweet;
                         CreateNewSweet(x, y, SweetsType.EMPTY);
                         filledNotFinished = true;
@@ -167,7 +173,7 @@ public class GameManager : MonoBehaviour {
 
                 sweets[x, 0] = newSweet.GetComponent<SweetsController>();
                 sweets[x, 0].Init(x, -1, this, SweetsType.NORMAL);
-                sweets[x, 0].MovedComponent.Move(x, 0);
+                sweets[x, 0].MovedComponent.Move(x, 0, fillTime);
                 sweets[x, 0].ColoredComponent.SetThisType(  //随机生成一种类型的甜品 **枚举为特殊的int**
                     (SweetsColorType.ColorType)Random.Range(0, sweets[x, 0].ColoredComponent.MaxColorsNum));
                 filledNotFinished = true;
