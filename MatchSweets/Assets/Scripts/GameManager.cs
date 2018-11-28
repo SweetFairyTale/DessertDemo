@@ -102,6 +102,10 @@ public class GameManager : MonoBehaviour {
             }
         }
 
+        //!--test
+        Destroy(sweets[5, 5].gameObject);
+        CreateNewSweet(5, 5, SweetsType.BARRIER);
+
         //FillAll();
         StartCoroutine(FillAll());
 	}
