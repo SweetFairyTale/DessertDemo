@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour {
     private int columns = 10;
     private int rows = 10;
 
-    private float fillTime = 0.2f;
+    private float fillTime = 0.1f;
 
     public GameObject gridPrefab;
 
@@ -150,7 +150,7 @@ public class GameManager : MonoBehaviour {
             {
                 SweetsController sweet = sweets[x, y];
 
-                if(sweet.Movable())
+                if(sweet.Movable())  //无法移动则无法向下填充(垂直填充).
                 {
                     SweetsController sweetBelow = sweets[x, y + 1];
 
@@ -160,6 +160,38 @@ public class GameManager : MonoBehaviour {
                         sweets[x, y + 1] = sweet;
                         CreateNewSweet(x, y, SweetsType.EMPTY);
                         filledNotFinished = true;
+                    }
+                }
+                else //向左右偏移填充
+                {
+                    for(int d = -1; d <=1;d++)
+                    {
+                        if(d != 0)  //排除正下方.
+                        {
+                            int dX = x + d;
+
+                            if(dX >= 0 && dX < columns)
+                            {
+                                SweetsController downSweet = sweets[dX, y + 1];
+                                if(downSweet.Type == SweetsType.EMPTY)
+                                {
+                                    bool vertical_fillable = true;
+                                    for(int above = 0;above>=0;above--)
+                                    {
+                                        SweetsController aboveSweet = sweets[dX, above];
+                                        if(aboveSweet.Movable())
+                                        {
+                                            //左下方空白的正上方有可向下填充的物体，则不用向侧下填充.
+                                            break;
+                                        }
+                                        else if(!aboveSweet.Movable()&&aboveSweet.Type != SweetsType.EMPTY)
+                                        {
+                                            vertical_fillable = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
