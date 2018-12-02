@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     //甜品元素类型枚举
     public enum SweetsType
@@ -16,7 +17,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public Dictionary<SweetsType, GameObject> sweetsPrefabDic;
-    
+
     [System.Serializable] //C#序列化
     public struct SweetsPrefab
     {
@@ -57,20 +58,21 @@ public class GameManager : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         //为字典赋值
         sweetsPrefabDic = new Dictionary<SweetsType, GameObject>();
-        for(int i = 0; i < sweetsPrefabs.Length; i++)
+        for (int i = 0; i < sweetsPrefabs.Length; i++)
         {
-            if(!sweetsPrefabDic.ContainsKey(sweetsPrefabs[i].type))
+            if (!sweetsPrefabDic.ContainsKey(sweetsPrefabs[i].type))
             {
                 sweetsPrefabDic.Add(sweetsPrefabs[i].type, sweetsPrefabs[i].prefab);
             }
         }
 
-		for(int x = 0; x < columns; x++)
+        for (int x = 0; x < columns; x++)
         {
-            for(int y = 0; y < rows; y++)
+            for (int y = 0; y < rows; y++)
             {
                 GameObject chocolate = Instantiate(gridPrefab, CalibratePosition(x, y), Quaternion.identity);
                 chocolate.transform.SetParent(transform);
@@ -78,7 +80,7 @@ public class GameManager : MonoBehaviour {
         }
 
         sweets = new SweetsController[columns, rows];
-        for(int x = 0; x < columns; x++)
+        for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
             {
@@ -108,8 +110,8 @@ public class GameManager : MonoBehaviour {
 
         //FillAll();
         StartCoroutine(FillAll());
-	}
-	
+    }
+
 
     public Vector3 CalibratePosition(int x, int y)
     {
@@ -132,7 +134,7 @@ public class GameManager : MonoBehaviour {
     //Fill all the grids with sweets.
     public IEnumerator FillAll()
     {
-        while(Fill())
+        while (Fill())
         {
             yield return new WaitForSeconds(fillTime);
         }
@@ -144,49 +146,61 @@ public class GameManager : MonoBehaviour {
         bool filledNotFinished = false;
 
         //From bottom to top.
-        for(int y = rows-2; y >= 0; y--)
+        for (int y = rows - 2; y >= 0; y--)
         {
-            for(int x = 0; x < columns; x++)
+            for (int x = 0; x < columns; x++)
             {
                 SweetsController sweet = sweets[x, y];
 
-                if(sweet.Movable())  //无法移动则无法向下填充(垂直填充).
+                if (sweet.Movable())  //无法移动则无法向下填充(垂直填充).
                 {
                     SweetsController sweetBelow = sweets[x, y + 1];
 
-                    if(sweetBelow.Type == SweetsType.EMPTY)
+                    if (sweetBelow.Type == SweetsType.EMPTY) //垂直填充.
                     {
+                        Destroy(sweetBelow.gameObject);  //!?
                         sweet.MovedComponent.Move(x, y + 1, fillTime);
                         sweets[x, y + 1] = sweet;
                         CreateNewSweet(x, y, SweetsType.EMPTY);
                         filledNotFinished = true;
                     }
-                }
-                else //向左右偏移填充
-                {
-                    for(int d = -1; d <=1;d++)
+                    else //向左右偏移填充
                     {
-                        if(d != 0)  //排除正下方.
+                        for (int d = -1; d <= 1; d++)
                         {
-                            int dX = x + d;
-
-                            if(dX >= 0 && dX < columns)
+                            if (d != 0)  //排除正下方.
                             {
-                                SweetsController downSweet = sweets[dX, y + 1];
-                                if(downSweet.Type == SweetsType.EMPTY)
+                                int down = x + d;
+
+                                if (down >= 0 && down < columns)
                                 {
-                                    bool vertical_fillable = true;
-                                    for(int above = 0;above>=0;above--)
+                                    SweetsController downSweet = sweets[down, y + 1];
+                                    if (downSweet.Type == SweetsType.EMPTY)
                                     {
-                                        SweetsController aboveSweet = sweets[dX, above];
-                                        if(aboveSweet.Movable())
+                                        bool vertical_fillable = true;  //用于判断垂直填充是否能满足向下填充.
+                                        for (int above = y; above >= 0; above--)
                                         {
-                                            //左下方空白的正上方有可向下填充的物体，则不用向侧下填充.
-                                            break;
+                                            SweetsController aboveSweet = sweets[down, above];
+                                            if (aboveSweet.Movable())
+                                            {
+                                                //左下方空白的正上方有可向下填充的物体，则不用向侧下填充.
+                                                break;
+                                            }
+                                            else if (!aboveSweet.Movable() && aboveSweet.Type != SweetsType.EMPTY)
+                                            {
+                                                vertical_fillable = false;
+                                                break;
+                                            }
                                         }
-                                        else if(!aboveSweet.Movable()&&aboveSweet.Type != SweetsType.EMPTY)
+
+                                        if (!vertical_fillable)
                                         {
-                                            vertical_fillable = false;
+                                            Destroy(downSweet.gameObject);
+                                            sweet.MovedComponent.Move(down, y + 1, fillTime);
+                                            sweets[down, y + 1] = sweet;
+                                            CreateNewSweet(x, y, SweetsType.EMPTY);
+                                            filledNotFinished = true;
+                                            break;
                                         }
                                     }
                                 }
@@ -194,16 +208,17 @@ public class GameManager : MonoBehaviour {
                         }
                     }
                 }
+
             }
         }
 
         //Exceptional case: the top row
-        for(int x = 0; x < rows; x++)
+        for (int x = 0; x < rows; x++)
         {
             SweetsController sweet = sweets[x, 0];
-            if(sweet.Type == SweetsType.EMPTY)
+            if (sweet.Type == SweetsType.EMPTY)
             {
-                GameObject newSweet = 
+                GameObject newSweet =
                 Instantiate(sweetsPrefabDic[SweetsType.NORMAL], CalibratePosition(x, -1), Quaternion.identity);
                 newSweet.transform.parent = transform;
 
