@@ -52,6 +52,10 @@ public class GameManager : MonoBehaviour
     //Sweets Array
     private SweetsController[,] sweets;
 
+    //Two sweets (refer to the mouse action) that waiting to be exchanged.
+    private SweetsController currentSweet;
+    private SweetsController targetSweet;
+
     private void Awake()
     {
         _instance = this;
@@ -232,5 +236,44 @@ public class GameManager : MonoBehaviour
         }
         //Filling finished or not.
         return filledNotFinished;
+    }
+
+    //Judge if two sweets are adjacent. 
+    private bool IsAdjacent(SweetsController sweet1, SweetsController sweet2)
+    {
+        return (sweet1.X == sweet2.X && Mathf.Abs(sweet1.Y - sweet2.Y) == 1) ||
+               (sweet1.Y == sweet2.Y && Mathf.Abs(sweet1.X - sweet2.X) == 1);
+    }
+
+    //Exchange the positions of two sweets.
+    private void ExchangeSweets(SweetsController sweet1, SweetsController sweet2)
+    {
+        if(sweet1.Movable()&&sweet2.Movable())
+        {          
+            sweets[sweet1.X, sweet1.Y] = sweet2;
+            sweets[sweet2.X, sweet2.Y] = sweet1;
+
+            int tempX = sweet1.X, tempY = sweet1.Y;
+            sweet1.MovedComponent.Move(sweet2.X, sweet2.Y, fillTime);
+            sweet2.MovedComponent.Move(tempX, tempY, fillTime);
+        }
+    }
+
+    public void PressCurrentSweet(SweetsController sweet)
+    {
+        currentSweet = sweet;
+    }
+
+    public void EnterTargetSweet(SweetsController sweet)
+    {
+        targetSweet = sweet;
+    }
+
+    public void ReleaseCurrentSweet()
+    {
+        if(IsAdjacent(currentSweet, targetSweet))
+        {
+            ExchangeSweets(currentSweet, targetSweet);
+        }
     }
 }

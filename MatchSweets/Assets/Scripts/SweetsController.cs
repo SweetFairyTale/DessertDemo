@@ -86,4 +86,19 @@ public class SweetsController : MonoBehaviour
     {
         return coloredComponent != null;
     }
+
+    private void OnMouseEnter()
+    {
+        gameManager.EnterTargetSweet(this);
+    }
+
+    private void OnMouseDown()
+    {
+        gameManager.PressCurrentSweet(this);
+    }
+
+    private void OnMouseUp()
+    {
+        gameManager.ReleaseCurrentSweet();
+    }
 }
