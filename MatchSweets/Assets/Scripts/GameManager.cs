@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     //甜品元素类型枚举
     public enum SweetsType
     {
@@ -274,6 +273,62 @@ public class GameManager : MonoBehaviour
         if(IsAdjacent(currentSweet, targetSweet))
         {
             ExchangeSweets(currentSweet, targetSweet);
+        }
+    }
+
+    public List<SweetsController> MatchSweets(SweetsController sweet, int newX, int newY)
+    {
+        if(sweet.ColorAble())
+        {
+            SweetsColorType.ColorType color = sweet.ColoredComponent.ThisType;
+            List<SweetsController> matchSweetsInSameRow = new List<SweetsController>();
+            List<SweetsController> matchSweetsInSameCol = new List<SweetsController>();
+            List<SweetsController> matchingResult = new List<SweetsController>();
+
+            matchSweetsInSameRow.Add(sweet);
+            //match the current row to the left and to the right.
+            for(int i = 0; i <= 1; i++)
+            {
+                for(int xDis = 1; xDis <  columns; xDis++)
+                {
+                    int x = newX;
+                    if(i == 0)  //traverse the left side.
+                    {
+                        x -= xDis;
+                    }
+                    if(i == 1)  //traverse the right side.
+                    {
+                        x += xDis;
+                    }
+                    if(x < 0 || x >= xDis)  //encounter the border.
+                    {
+                        break;
+                    }
+
+                    if(sweets[x, newY].ColorAble()&&sweets[x, newY].ColoredComponent.ThisType == color)
+                    {
+                        matchSweetsInSameRow.Add(sweets[x, newY]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if(matchSweetsInSameRow.Count >= 3)
+            {
+                for(int i = 0; i < matchSweetsInSameRow.Count; i++)
+                {
+                    matchingResult.Add(matchSweetsInSameRow[i]);
+                }
+            }
+
+            if(matchingResult.Count >= 3)
+            {
+                //If successed in matching sweets in one rows, then return. 
+                return matchingResult;
+            }
         }
     }
 }
