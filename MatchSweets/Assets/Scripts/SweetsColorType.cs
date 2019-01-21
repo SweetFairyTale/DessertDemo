@@ -29,7 +29,7 @@ public class SweetsColorType : MonoBehaviour {
 
     private SpriteRenderer sprite;  //sprite
 
-    public int MaxColorsNum   //限制随机数生成，拥有的颜色数量.
+    public int MaxColorsNum   //限制随机数生成个数不超过拥有的颜色数量.
     {
         get { return colorSprites.Length; }
     }

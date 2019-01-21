@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<SweetsType, GameObject> sweetsPrefabDic;
 
-    [System.Serializable] //C#序列化
+    [System.Serializable] // C# serializing
     public struct SweetsPrefab
     {
         public SweetsType type;
@@ -62,8 +62,7 @@ public class GameManager : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {
-        //为字典赋值
+    {       
         sweetsPrefabDic = new Dictionary<SweetsType, GameObject>();
         for (int i = 0; i < sweetsPrefabs.Length; i++)
         {
@@ -157,11 +156,11 @@ public class GameManager : MonoBehaviour
 
                 if (sweet.Movable())  //无法移动则无法向下填充(垂直填充).
                 {
-                    SweetsController sweetBelow = sweets[x, y + 1];
+                    SweetsController sweetBelow = sweets[x, y + 1];  //得到当前位置下方的实体.
 
-                    if (sweetBelow.Type == SweetsType.EMPTY) //垂直填充.
+                    if (sweetBelow.Type == SweetsType.EMPTY) //下方当前为空物体，允许垂直填充.
                     {
-                        Destroy(sweetBelow.gameObject);  //!?
+                        Destroy(sweetBelow.gameObject);
                         sweet.MovedComponent.Move(x, y + 1, fillTime);
                         sweets[x, y + 1] = sweet;
                         CreateNewSweet(x, y, SweetsType.EMPTY);
@@ -216,7 +215,7 @@ public class GameManager : MonoBehaviour
         }
 
         //Exceptional case: the top row
-        for (int x = 0; x < rows; x++)
+        for (int x = 0; x < columns; x++)
         {
             SweetsController sweet = sweets[x, 0];
             if (sweet.Type == SweetsType.EMPTY)
@@ -252,9 +251,17 @@ public class GameManager : MonoBehaviour
             sweets[sweet1.X, sweet1.Y] = sweet2;
             sweets[sweet2.X, sweet2.Y] = sweet1;
 
-            int tempX = sweet1.X, tempY = sweet1.Y;
-            sweet1.MovedComponent.Move(sweet2.X, sweet2.Y, fillTime);
-            sweet2.MovedComponent.Move(tempX, tempY, fillTime);
+            if (MatchSweets(sweet1, sweet2.X, sweet2.Y) != null || MatchSweets(sweet2, sweet1.X, sweet1.Y) != null)
+            {
+                int tempX = sweet1.X, tempY = sweet1.Y;
+                sweet1.MovedComponent.Move(sweet2.X, sweet2.Y, fillTime);
+                sweet2.MovedComponent.Move(tempX, tempY, fillTime);
+            }
+            else
+            {
+                sweets[sweet1.X, sweet1.Y] = sweet1;
+                sweets[sweet2.X, sweet2.Y] = sweet2;
+            }           
         }
     }
 
@@ -285,8 +292,9 @@ public class GameManager : MonoBehaviour
             List<SweetsController> matchSweetsInSameCol = new List<SweetsController>();
             List<SweetsController> matchingResult = new List<SweetsController>();
 
+            //row maching
             matchSweetsInSameRow.Add(sweet);
-            //match the current row to the left and to the right.
+            //match the current row.(0->left, 1->right)
             for(int i = 0; i <= 1; i++)
             {
                 for(int xDis = 1; xDis <  columns; xDis++)
@@ -300,7 +308,7 @@ public class GameManager : MonoBehaviour
                     {
                         x += xDis;
                     }
-                    if(x < 0 || x >= xDis)  //encounter the border.
+                    if(x < 0 || x >= columns)  //encounter the border.
                     {
                         break;
                     }
@@ -316,19 +324,152 @@ public class GameManager : MonoBehaviour
                 }
             }
 
+            //"L","T" shape matching.
             if(matchSweetsInSameRow.Count >= 3)
-            {
-                for(int i = 0; i < matchSweetsInSameRow.Count; i++)
+            {            
+                for (int i = 0; i < matchSweetsInSameRow.Count; i++)  
                 {
-                    matchingResult.Add(matchSweetsInSameRow[i]);
+                    matchingResult.Add(matchSweetsInSameRow[i]);                               
+                }
+                for (int j = 0; j <= 1; j++)  //只需扫描被调换元素的列而无需所有行匹配成功元素？
+                {
+                    //apply col-matching to the first element.
+                    for (int yDis = 0; yDis <= rows; yDis++)  //起始值为1？
+                    {
+                        int y = newY;
+                        if (j == 0)
+                        {
+                            y -= yDis;
+                        }
+                        if (j == 1)
+                        {
+                            y += yDis;
+                        }
+                        if (y < 0 || y >= rows)
+                        {
+                            break;
+                        }
+
+                        if (sweets[matchSweetsInSameRow[0].X, y].ColorAble() && sweets[matchSweetsInSameRow[0].X, y].ColoredComponent.ThisType == color)
+                        {
+                            matchSweetsInSameCol.Add(sweets[matchSweetsInSameRow[0].X, y]);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (matchSweetsInSameCol.Count < 2)
+                {
+                    matchSweetsInSameCol.Clear();
+                }
+                else
+                {
+                    for (int k = 0; k < matchSweetsInSameCol.Count; k++)
+                    {
+                        matchingResult.Add(matchSweetsInSameCol[k]);
+                    }
                 }
             }
 
             if(matchingResult.Count >= 3)
             {
-                //If successed in matching sweets in one rows, then return. 
+                //If successed in matching sweets in one row, then return. 
+                return matchingResult;
+            }
+            else
+            {
+                matchSweetsInSameRow.Clear();
+                matchSweetsInSameCol.Clear();
+            }
+
+            //columns matching
+            matchSweetsInSameCol.Add(sweet);  //basic element
+            //match the current row to the left and to the right.
+            for (int i = 0; i <= 1; i++)
+            {
+                for (int yDis = 1; yDis < rows; yDis++)
+                {
+                    int y = newY;
+                    if (i == 0)  //traverse the up side.
+                    {
+                        y -= yDis;
+                    }
+                    if (i == 1)  //traverse the down side.
+                    {
+                        y += yDis;
+                    }
+                    if (y < 0 || y >= rows)  //encounter the border.
+                    {
+                        break;
+                    }
+
+                    if (sweets[newX, y].ColorAble() && sweets[newX, y].ColoredComponent.ThisType == color)
+                    {
+                        matchSweetsInSameCol.Add(sweets[newX, y]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (matchSweetsInSameCol.Count >= 3)
+            {
+                for (int i = 0; i < matchSweetsInSameCol.Count; i++)
+                {
+                    matchingResult.Add(matchSweetsInSameCol[i]);
+                }
+                for (int j = 0; j <= 1; j++)
+                {
+                    for (int xDis = 0; xDis < columns; xDis++)
+                    {
+                        int x = newX;
+                        if (j == 0)
+                        {
+                            x -= xDis;
+                        }
+                        if (j == 1)
+                        {
+                            x += xDis;
+                        }
+                        if (x < 0 || x >= columns)
+                        {
+                            break;
+                        }
+
+                        if (sweets[x, matchSweetsInSameCol[0].Y].ColorAble() && sweets[x, matchSweetsInSameCol[0].Y].ColoredComponent.ThisType == color)
+                        {
+                            matchSweetsInSameRow.Add(sweets[x, matchSweetsInSameCol[0].Y]);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (matchSweetsInSameRow.Count < 2)
+                {
+                    matchSweetsInSameRow.Clear();
+                }
+                else
+                {
+                    for (int k = 0; k < matchSweetsInSameRow.Count; k++)
+                    {
+                        matchingResult.Add(matchSweetsInSameRow[k]);
+                    }
+                }
+            }
+
+            if (matchingResult.Count >= 3)
+            {
+                //If successed in matching sweets in one column. 
                 return matchingResult;
             }
         }
+
+        return null;
     }
 }
