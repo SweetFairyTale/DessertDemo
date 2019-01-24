@@ -9,6 +9,9 @@ public class SweetsController : MonoBehaviour
     private int y;
     private GameManager.SweetsType type;
     private SweetsMovement movedComponent;
+    private SweetsColorType coloredComponent;
+    private Eliminate elimiComponent;
+
     public int X
     {
         get
@@ -49,7 +52,6 @@ public class SweetsController : MonoBehaviour
             return movedComponent;
         }
     }
-
     public SweetsColorType ColoredComponent
     {
         get
@@ -57,15 +59,25 @@ public class SweetsController : MonoBehaviour
             return coloredComponent;
         }
     }
-    private SweetsColorType coloredComponent;
-   
+    public Eliminate ElimiComponent
+    {
+        get
+        {
+            return elimiComponent;
+        }
+    }
+
+      
     [HideInInspector]
     public GameManager gameManager;
+
+
 
     private void Awake()
     {
         movedComponent = GetComponent<SweetsMovement>();
         coloredComponent = GetComponent<SweetsColorType>();
+        elimiComponent = GetComponent<Eliminate>();
     }
 
     public void Init(int _x, int _y, GameManager _gameManager, GameManager.SweetsType _type)
@@ -85,6 +97,11 @@ public class SweetsController : MonoBehaviour
     public bool ColorAble()
     {
         return coloredComponent != null;
+    }
+
+    public bool Eliminable()
+    {
+        return elimiComponent != null;
     }
 
     private void OnMouseEnter()

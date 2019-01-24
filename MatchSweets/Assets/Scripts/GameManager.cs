@@ -105,8 +105,7 @@ public class GameManager : MonoBehaviour
                 //}
             }
         }
-
-        //!--test
+        
         Destroy(sweets[5, 5].gameObject);
         CreateNewSweet(5, 5, SweetsType.BARRIER);
 
@@ -136,9 +135,16 @@ public class GameManager : MonoBehaviour
     //Fill all the grids with sweets.
     public IEnumerator FillAll()
     {
-        while (Fill())
+        bool needFill = true;
+        while(needFill)
         {
             yield return new WaitForSeconds(fillTime);
+            while (Fill())
+            {
+                yield return new WaitForSeconds(fillTime);
+            }
+
+            needFill = EliminateAllMatchedSweets();
         }
     }
 
@@ -256,6 +262,8 @@ public class GameManager : MonoBehaviour
                 int tempX = sweet1.X, tempY = sweet1.Y;
                 sweet1.MovedComponent.Move(sweet2.X, sweet2.Y, fillTime);
                 sweet2.MovedComponent.Move(tempX, tempY, fillTime);
+                EliminateAllMatchedSweets();
+                StartCoroutine(FillAll());
             }
             else
             {
@@ -265,6 +273,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Player Event.
+    /// </summary>
+    #region
     public void PressCurrentSweet(SweetsController sweet)
     {
         currentSweet = sweet;
@@ -282,6 +294,7 @@ public class GameManager : MonoBehaviour
             ExchangeSweets(currentSweet, targetSweet);
         }
     }
+    #endregion
 
     public List<SweetsController> MatchSweets(SweetsController sweet, int newX, int newY)
     {
@@ -334,7 +347,7 @@ public class GameManager : MonoBehaviour
                 for (int j = 0; j <= 1; j++)  //只需扫描被调换元素的列而无需所有行匹配成功元素？
                 {
                     //apply col-matching to the first element.
-                    for (int yDis = 0; yDis <= rows; yDis++)  //起始值为1？
+                    for (int yDis = 1; yDis <= rows; yDis++)
                     {
                         int y = newY;
                         if (j == 0)
@@ -424,7 +437,7 @@ public class GameManager : MonoBehaviour
                 }
                 for (int j = 0; j <= 1; j++)
                 {
-                    for (int xDis = 0; xDis < columns; xDis++)
+                    for (int xDis = 1; xDis < columns; xDis++)
                     {
                         int x = newX;
                         if (j == 0)
@@ -472,4 +485,45 @@ public class GameManager : MonoBehaviour
 
         return null;
     }
+
+    //Eliminate Function
+    public bool EliminateSweet(int x, int y)
+    {
+        if(sweets[x,y].Eliminable()&&!sweets[x,y].ElimiComponent.Eliminating)
+        {
+            sweets[x, y].ElimiComponent.Elimi();
+            CreateNewSweet(x, y, SweetsType.EMPTY);
+            return true;
+        }
+        return false;
+    }
+
+    //Eliminate sweets in all range.
+    private bool EliminateAllMatchedSweets()
+    {
+        bool needFill = false;
+
+        for(int y = 0; y < rows; y++)
+        {
+            for(int x = 0; x < columns; x++)
+            {
+                if(sweets[x,y].Eliminable())
+                {
+                    List<SweetsController> matchList = MatchSweets(sweets[x, y], x, y);
+
+                    if(matchList != null)
+                    {
+                        for(int i = 0; i < matchList.Count; i++)
+                        {
+                            if (EliminateSweet(matchList[i].X, matchList[i].Y))
+                                needFill = true;
+                        }
+                    }
+
+                }
+            }
+        }
+        return needFill;
+    }
+
 }
