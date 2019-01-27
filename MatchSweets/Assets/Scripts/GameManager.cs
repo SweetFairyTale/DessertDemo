@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     }
 
     private int columns = 10;
-    private int rows = 10;
+    private int rows = 9;
 
     private float fillTime = 0.1f;
 
