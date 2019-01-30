@@ -140,6 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ClearAnim: {fileID: 7400000, guid: 3877c3f127ae74d44aa17aac5df993d5, type: 2}
+  destroy: {fileID: 8300000, guid: 9cb19eb032d304b07acec596ae2ce4a4, type: 3}
 --- !u!114 &114689511540589830
 MonoBehaviour:
   m_ObjectHideFlags: 1

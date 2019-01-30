@@ -6,7 +6,9 @@ public class Eliminate : MonoBehaviour {
 
     public AnimationClip ClearAnim;
 
-    private bool eliminating;    
+    private bool eliminating;
+
+    public AudioClip destroy;
 
     public bool Eliminating
     {
@@ -30,6 +32,8 @@ public class Eliminate : MonoBehaviour {
         if(anim!=null)
         {
             anim.Play(ClearAnim.name);
+            GameManager.Instance.playerScore++;
+            AudioSource.PlayClipAtPoint(destroy, transform.position);
             yield return new WaitForSeconds(ClearAnim.length);
             Destroy(gameObject);
         }

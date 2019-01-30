@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,8 +28,8 @@ public class GameManager : MonoBehaviour
     public SweetsPrefab[] sweetsPrefabs;
 
     //Single Instance.
-    private GameManager _instance;
-    public GameManager Instance
+    private static GameManager _instance;
+    public static GameManager Instance
     {
         get
         {
@@ -51,9 +52,19 @@ public class GameManager : MonoBehaviour
     //Sweets Array
     private SweetsController[,] sweets;
 
-    //Two sweets (refer to the mouse action) that waiting to be exchanged.
+    //Two sweets (refer to the mouse event) that waiting to be exchanged.
     private SweetsController currentSweet;
     private SweetsController targetSweet;
+
+    public Text timeText;
+    private float gameTime = 60f;
+    private bool gameOver = false;
+
+    public int playerScore;
+    public Text scoreText;
+
+    private float intervalTime;
+    private float currentScore;
 
     private void Awake()
     {
@@ -113,6 +124,37 @@ public class GameManager : MonoBehaviour
         StartCoroutine(FillAll());
     }
 
+    void Update()
+    {
+        if(gameOver)
+        {
+            return;
+        }
+        gameTime -= Time.deltaTime;
+        if (gameTime<=0)
+        {
+            gameTime = 0;
+            //...
+            gameOver = true;
+            return;
+        }       
+        timeText.text = gameTime.ToString("0");  //"0"-Rounding ("0.0","0.00"...)
+
+        if (intervalTime <= 0.05f)
+        {
+            intervalTime += Time.deltaTime;
+        }
+        else
+        {
+            if(currentScore < playerScore)
+            {
+                currentScore++;
+                scoreText.text = currentScore.ToString();
+                intervalTime = 0;
+            }
+        }
+        //scoreText.text = playerScore.ToString();
+    }
 
     public Vector3 CalibratePosition(int x, int y)
     {
@@ -279,20 +321,23 @@ public class GameManager : MonoBehaviour
     #region
     public void PressCurrentSweet(SweetsController sweet)
     {
-        currentSweet = sweet;
+        if (!gameOver)
+            currentSweet = sweet;
     }
 
     public void EnterTargetSweet(SweetsController sweet)
     {
-        targetSweet = sweet;
+        if (!gameOver)
+            targetSweet = sweet;
     }
 
     public void ReleaseCurrentSweet()
     {
-        if(IsAdjacent(currentSweet, targetSweet))
-        {
-            ExchangeSweets(currentSweet, targetSweet);
-        }
+        if (!gameOver)
+            if (IsAdjacent(currentSweet, targetSweet))
+            {
+                ExchangeSweets(currentSweet, targetSweet);
+            }
     }
     #endregion
 
