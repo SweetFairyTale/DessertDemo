@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
     private SweetsController targetSweet;
 
     public Text timeText;
-    private float gameTime = 60f;
+    private float gameTime = 2f;
     private bool gameOver = false;
 
     public int playerScore;
@@ -68,6 +68,8 @@ public class GameManager : MonoBehaviour
     private float currentScore;
 
     public GameObject gameOverPanel;
+
+    public Text finalScoreText;
 
     private void Awake()
     {
@@ -129,18 +131,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if(gameOver)
-        {
-            return;
-        }
         gameTime -= Time.deltaTime;
         if (gameTime<=0)
         {
             gameTime = 0;
             //...
             gameOverPanel.SetActive(true);
+            finalScoreText.text = scoreText.text;
             gameOver = true;
-            return;
+            //return;
         }       
         timeText.text = gameTime.ToString("0");  //"0"-Rounding ("0.0","0.00"...)
 
@@ -542,6 +541,7 @@ public class GameManager : MonoBehaviour
         {
             sweets[x, y].ElimiComponent.Elimi();
             CreateNewSweet(x, y, SweetsType.EMPTY);
+            ClearBarrier(x, y);
             return true;
         }
         return false;
@@ -573,6 +573,34 @@ public class GameManager : MonoBehaviour
             }
         }
         return needFill;
+    }
+
+    //Eliminate biscuit barriers.
+    private void ClearBarrier(int x, int y)
+    {
+        for(int nearbyX = x-1; nearbyX <= x+1; nearbyX++)
+        {
+            if(nearbyX!=x && nearbyX >= 0 && nearbyX < columns)
+            {
+                if(sweets[nearbyX,y].Type == SweetsType.BARRIER && sweets[nearbyX, y].Eliminable())
+                {
+                    sweets[nearbyX, y].ElimiComponent.Elimi();
+                    CreateNewSweet(nearbyX, y, SweetsType.EMPTY);
+                }
+            }
+        }
+
+        for (int nearbyY = y - 1; nearbyY <= y + 1; nearbyY++)
+        {
+            if (nearbyY != y && nearbyY >= 0 && nearbyY < rows)
+            {
+                if (sweets[x, nearbyY].Type == SweetsType.BARRIER && sweets[x, nearbyY].Eliminable())
+                {
+                    sweets[x, nearbyY].ElimiComponent.Elimi();
+                    CreateNewSweet(x, nearbyY, SweetsType.EMPTY);
+                }
+            }
+        }
     }
 
     public void BackToMainScene()
