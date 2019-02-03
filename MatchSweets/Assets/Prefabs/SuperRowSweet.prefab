@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114916233789280808}
   - component: {fileID: 114006884772644534}
   - component: {fileID: 114879008222622694}
-  - component: {fileID: 114070666105662020}
+  - component: {fileID: 114077720027467056}
   - component: {fileID: 61428607324363846}
   - component: {fileID: 95449185639041936}
   m_Layer: 0
@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 560757aa8a22b0f4e87a2bf3f83381d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114070666105662020
+--- !u!114 &114077720027467056
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -136,11 +136,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1450860911639208}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccc19b6f6fef0af4ab10377c0a142b99, type: 3}
+  m_Script: {fileID: 11500000, guid: 96d3dac32bf73784a8471d15dd636b6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ClearAnim: {fileID: 7400000, guid: 3877c3f127ae74d44aa17aac5df993d5, type: 2}
-  destroy: {fileID: 8300000, guid: 9cb19eb032d304b07acec596ae2ce4a4, type: 3}
+  destroy: {fileID: 8300000, guid: 5aaa4c7d5781546c6a13a9f1eb97b15b, type: 3}
+  isRow: 1
 --- !u!114 &114879008222622694
 MonoBehaviour:
   m_ObjectHideFlags: 1

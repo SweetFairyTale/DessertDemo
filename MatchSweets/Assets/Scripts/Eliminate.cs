@@ -10,6 +10,13 @@ public class Eliminate : MonoBehaviour {
 
     public AudioClip destroy;
 
+    protected SweetsController sweet;
+
+    private void Awake()
+    {
+        sweet = GetComponent<SweetsController>();    
+    }
+
     public bool Eliminating
     {
         get
@@ -18,7 +25,7 @@ public class Eliminate : MonoBehaviour {
         }
     }
 
-    protected SweetsController sweet;
+    
 
     public virtual void Elimi()
     {

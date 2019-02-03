@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
         EMPTY,
         NORMAL,
         BARRIER,
+        ROW_CLEAR,
         COLUMN_CLEAR,
         RAINBOW_CANDY,
         COUNT
@@ -58,7 +59,7 @@ public class GameManager : MonoBehaviour
     private SweetsController targetSweet;
 
     public Text timeText;
-    private float gameTime = 2f;
+    private float gameTime = 60f;
     private bool gameOver = false;
 
     public int playerScore;
@@ -78,7 +79,7 @@ public class GameManager : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {       
+    {
         sweetsPrefabDic = new Dictionary<SweetsType, GameObject>();
         for (int i = 0; i < sweetsPrefabs.Length; i++)
         {
@@ -121,7 +122,7 @@ public class GameManager : MonoBehaviour
                 //}
             }
         }
-        
+
         Destroy(sweets[5, 5].gameObject);
         CreateNewSweet(5, 5, SweetsType.BARRIER);
 
@@ -132,7 +133,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         gameTime -= Time.deltaTime;
-        if (gameTime<=0)
+        if (gameTime <= 0)
         {
             gameTime = 0;
             //...
@@ -140,7 +141,7 @@ public class GameManager : MonoBehaviour
             finalScoreText.text = scoreText.text;
             gameOver = true;
             //return;
-        }       
+        }
         timeText.text = gameTime.ToString("0");  //"0"-Rounding ("0.0","0.00"...)
 
         if (intervalTime <= 0.05f)
@@ -149,7 +150,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            if(currentScore < playerScore)
+            if (currentScore < playerScore)
             {
                 currentScore++;
                 scoreText.text = currentScore.ToString();
@@ -181,7 +182,7 @@ public class GameManager : MonoBehaviour
     public IEnumerator FillAll()
     {
         bool needFill = true;
-        while(needFill)
+        while (needFill)
         {
             yield return new WaitForSeconds(fillTime);
             while (Fill())
@@ -297,8 +298,8 @@ public class GameManager : MonoBehaviour
     //Exchange the positions of two sweets.
     private void ExchangeSweets(SweetsController sweet1, SweetsController sweet2)
     {
-        if(sweet1.Movable()&&sweet2.Movable())
-        {          
+        if (sweet1.Movable() && sweet2.Movable())
+        {
             sweets[sweet1.X, sweet1.Y] = sweet2;
             sweets[sweet2.X, sweet2.Y] = sweet1;
 
@@ -314,7 +315,7 @@ public class GameManager : MonoBehaviour
             {
                 sweets[sweet1.X, sweet1.Y] = sweet1;
                 sweets[sweet2.X, sweet2.Y] = sweet2;
-            }           
+            }
         }
     }
 
@@ -346,7 +347,7 @@ public class GameManager : MonoBehaviour
 
     public List<SweetsController> MatchSweets(SweetsController sweet, int newX, int newY)
     {
-        if(sweet.ColorAble())
+        if (sweet.ColorAble())
         {
             SweetsColorType.ColorType color = sweet.ColoredComponent.ThisType;
             List<SweetsController> matchSweetsInSameRow = new List<SweetsController>();
@@ -356,25 +357,25 @@ public class GameManager : MonoBehaviour
             //row maching
             matchSweetsInSameRow.Add(sweet);
             //match the current row.(0->left, 1->right)
-            for(int i = 0; i <= 1; i++)
+            for (int i = 0; i <= 1; i++)
             {
-                for(int xDis = 1; xDis <  columns; xDis++)
+                for (int xDis = 1; xDis < columns; xDis++)
                 {
                     int x = newX;
-                    if(i == 0)  //traverse the left side.
+                    if (i == 0)  //traverse the left side.
                     {
                         x -= xDis;
                     }
-                    if(i == 1)  //traverse the right side.
+                    if (i == 1)  //traverse the right side.
                     {
                         x += xDis;
                     }
-                    if(x < 0 || x >= columns)  //encounter the border.
+                    if (x < 0 || x >= columns)  //encounter the border.
                     {
                         break;
                     }
 
-                    if(sweets[x, newY].ColorAble()&&sweets[x, newY].ColoredComponent.ThisType == color)
+                    if (sweets[x, newY].ColorAble() && sweets[x, newY].ColoredComponent.ThisType == color)
                     {
                         matchSweetsInSameRow.Add(sweets[x, newY]);
                     }
@@ -386,11 +387,11 @@ public class GameManager : MonoBehaviour
             }
 
             //"L","T" shape matching.
-            if(matchSweetsInSameRow.Count >= 3)
-            {            
-                for (int i = 0; i < matchSweetsInSameRow.Count; i++)  
+            if (matchSweetsInSameRow.Count >= 3)
+            {
+                for (int i = 0; i < matchSweetsInSameRow.Count; i++)
                 {
-                    matchingResult.Add(matchSweetsInSameRow[i]);                               
+                    matchingResult.Add(matchSweetsInSameRow[i]);
                 }
                 for (int j = 0; j <= 1; j++)  //只需扫描被调换元素的列而无需所有行匹配成功元素？
                 {
@@ -434,7 +435,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            if(matchingResult.Count >= 3)
+            if (matchingResult.Count >= 3)
             {
                 //If successed in matching sweets in one row, then return. 
                 return matchingResult;
@@ -537,7 +538,7 @@ public class GameManager : MonoBehaviour
     //Eliminate Function
     public bool EliminateSweet(int x, int y)
     {
-        if(sweets[x,y].Eliminable()&&!sweets[x,y].ElimiComponent.Eliminating)
+        if (sweets[x, y].Eliminable() && !sweets[x, y].ElimiComponent.Eliminating)
         {
             sweets[x, y].ElimiComponent.Elimi();
             CreateNewSweet(x, y, SweetsType.EMPTY);
@@ -552,23 +553,49 @@ public class GameManager : MonoBehaviour
     {
         bool needFill = false;
 
-        for(int y = 0; y < rows; y++)
+        for (int y = 0; y < rows; y++)
         {
-            for(int x = 0; x < columns; x++)
+            for (int x = 0; x < columns; x++)
             {
-                if(sweets[x,y].Eliminable())
+                if (sweets[x, y].Eliminable())
                 {
                     List<SweetsController> matchList = MatchSweets(sweets[x, y], x, y);
 
-                    if(matchList != null)
+                    if (matchList != null)
                     {
-                        for(int i = 0; i < matchList.Count; i++)
+                        SweetsType superSweets = SweetsType.COUNT;
+                        SweetsController superSweetsPos = matchList[Random.Range(0, matchList.Count)];
+
+                        if (matchList.Count == 4)
+                        {
+                            superSweets = (SweetsType)Random.Range((int)SweetsType.ROW_CLEAR, (int)SweetsType.COLUMN_CLEAR);
+                        }
+
+                        //matchList.Count == 5 ... Rainbow Sweets
+
+                        for (int i = 0; i < matchList.Count; i++)
                         {
                             if (EliminateSweet(matchList[i].X, matchList[i].Y))
                                 needFill = true;
                         }
-                    }
 
+                        //Generate super sweets.
+                        if (superSweets != SweetsType.COUNT)
+                        {
+                            Destroy(sweets[superSweetsPos.X, superSweetsPos.Y]);
+                            SweetsController newSweets = CreateNewSweet(superSweetsPos.X, superSweetsPos.Y, superSweets);
+
+                            if (matchList.Count == 4 && newSweets.ColorAble() && matchList[0].ColorAble())
+                            {
+                                newSweets.ColoredComponent.SetThisType(matchList[0].ColoredComponent.ThisType);
+                            }
+                            else
+                            {
+                                //Generate Rainbow Sweets
+                            }
+
+                        }
+                    }
                 }
             }
         }
@@ -578,11 +605,11 @@ public class GameManager : MonoBehaviour
     //Eliminate biscuit barriers.
     private void ClearBarrier(int x, int y)
     {
-        for(int nearbyX = x-1; nearbyX <= x+1; nearbyX++)
+        for (int nearbyX = x - 1; nearbyX <= x + 1; nearbyX++)
         {
-            if(nearbyX!=x && nearbyX >= 0 && nearbyX < columns)
+            if (nearbyX != x && nearbyX >= 0 && nearbyX < columns)
             {
-                if(sweets[nearbyX,y].Type == SweetsType.BARRIER && sweets[nearbyX, y].Eliminable())
+                if (sweets[nearbyX, y].Type == SweetsType.BARRIER && sweets[nearbyX, y].Eliminable())
                 {
                     sweets[nearbyX, y].ElimiComponent.Elimi();
                     CreateNewSweet(nearbyX, y, SweetsType.EMPTY);
@@ -611,5 +638,23 @@ public class GameManager : MonoBehaviour
     public void Replay()
     {
         SceneManager.LoadScene(1);
+    }
+
+    //Row elimination
+    public void ClearRow(int row)
+    {
+        for(int x = 0; x < columns; x++)
+        {
+            EliminateSweet(x, row);
+        }
+    }
+
+    //Column elimination
+    public void ClearColumn(int column)
+    {
+        for(int y = 0; y < rows; y++)
+        {
+            EliminateSweet(column, y);
+        }
     }
 }
