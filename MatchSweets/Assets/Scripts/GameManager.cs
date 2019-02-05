@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
     private SweetsController targetSweet;
 
     public Text timeText;
-    private float gameTime = 60f;
+    private float gameTime = 10f;
     private bool gameOver = false;
 
     public int playerScore;
@@ -137,6 +137,7 @@ public class GameManager : MonoBehaviour
         {
             gameTime = 0;
             //...
+            timeText.GetComponent<Animator>().speed = 0;
             gameOverPanel.SetActive(true);
             finalScoreText.text = scoreText.text;
             gameOver = true;
@@ -303,11 +304,35 @@ public class GameManager : MonoBehaviour
             sweets[sweet1.X, sweet1.Y] = sweet2;
             sweets[sweet2.X, sweet2.Y] = sweet1;
 
-            if (MatchSweets(sweet1, sweet2.X, sweet2.Y) != null || MatchSweets(sweet2, sweet1.X, sweet1.Y) != null)
+            if (MatchSweets(sweet1, sweet2.X, sweet2.Y) != null || MatchSweets(sweet2, sweet1.X, sweet1.Y) != null
+                || sweet1.Type == SweetsType.RAINBOW_CANDY || sweet2.Type == SweetsType.RAINBOW_CANDY)
             {
                 int tempX = sweet1.X, tempY = sweet1.Y;
                 sweet1.MovedComponent.Move(sweet2.X, sweet2.Y, fillTime);
                 sweet2.MovedComponent.Move(tempX, tempY, fillTime);
+
+                if(sweet1.Type == SweetsType.RAINBOW_CANDY && sweet1.ColorAble() && sweet2.ColorAble())
+                {
+                    EliminateAnySweets clearColor = sweet1.GetComponent<EliminateAnySweets>();
+
+                    if(clearColor != null)
+                    {
+                        clearColor.ClearColor = sweet2.ColoredComponent.ThisType;
+                    }
+                    EliminateSweet(sweet1.X, sweet1.Y);
+                }
+
+                if (sweet2.Type == SweetsType.RAINBOW_CANDY && sweet1.ColorAble() && sweet2.ColorAble())
+                {
+                    EliminateAnySweets clearColor = sweet2.GetComponent<EliminateAnySweets>();
+
+                    if (clearColor != null)
+                    {
+                        clearColor.ClearColor = sweet1.ColoredComponent.ThisType;
+                    }
+                    EliminateSweet(sweet2.X, sweet2.Y);
+                }
+
                 EliminateAllMatchedSweets();
                 StartCoroutine(FillAll());
             }
@@ -571,7 +596,11 @@ public class GameManager : MonoBehaviour
                             superSweets = (SweetsType)Random.Range((int)SweetsType.ROW_CLEAR, (int)SweetsType.COLUMN_CLEAR);
                         }
 
-                        //matchList.Count == 5 ... Rainbow Sweets
+                        //matchList.Count >= 5 ... Rainbow Sweets
+                        if(matchList.Count >= 5)
+                        {
+                            superSweets = SweetsType.RAINBOW_CANDY;
+                        }
 
                         for (int i = 0; i < matchList.Count; i++)
                         {
@@ -589,9 +618,10 @@ public class GameManager : MonoBehaviour
                             {
                                 newSweets.ColoredComponent.SetThisType(matchList[0].ColoredComponent.ThisType);
                             }
-                            else
+                            else if (superSweets == SweetsType.RAINBOW_CANDY && newSweets.ColorAble())
                             {
                                 //Generate Rainbow Sweets
+                                newSweets.ColoredComponent.SetThisType(SweetsColorType.ColorType.UNIVERSAL);
                             }
 
                         }
@@ -655,6 +685,23 @@ public class GameManager : MonoBehaviour
         for(int y = 0; y < rows; y++)
         {
             EliminateSweet(column, y);
+        }
+    }
+
+
+    public void ClearColorType(SweetsColorType.ColorType color)
+    {
+        for(int x = 0; x < columns; x++)
+        {
+            for(int y = 0; y < rows; y++)
+            {
+                if(sweets[x,y].ColorAble() 
+                    && (sweets[x,y].ColoredComponent.ThisType == color 
+                    || color == SweetsColorType.ColorType.UNIVERSAL))
+                {
+                    EliminateSweet(x, y);
+                }
+            }
         }
     }
 }

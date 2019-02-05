@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 114559849558439706}
   - component: {fileID: 114066718229851004}
   - component: {fileID: 61516087061327194}
+  - component: {fileID: 114313129062250992}
   - component: {fileID: 95245021776803284}
   m_Layer: 0
   m_Name: RainbowSweets
@@ -220,6 +221,19 @@ MonoBehaviour:
   colorSprites:
   - color: 6
     sprite: {fileID: 21300000, guid: 4c2cf86324edaa041a728bdb5e7fca3d, type: 3}
+--- !u!114 &114313129062250992
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208574136854840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72c300cb2ed415840bdc9a93185b608f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ClearAnim: {fileID: 7400000, guid: 3547a9a61be8f1644bfaedf1919ab041, type: 2}
+  destroy: {fileID: 0}
 --- !u!114 &114559849558439706
 MonoBehaviour:
   m_ObjectHideFlags: 1
