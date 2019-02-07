@@ -38,9 +38,9 @@ public class Eliminate : MonoBehaviour {
         Animator anim = GetComponent<Animator>();
         if(anim!=null)
         {
-            anim.Play(ClearAnim.name);
-            GameManager.Instance.playerScore++;
             AudioSource.PlayClipAtPoint(destroy, transform.position);
+            anim.Play(ClearAnim.name);
+            GameManager.Instance.playerScore++;           
             yield return new WaitForSeconds(ClearAnim.length);
             Destroy(gameObject);
         }

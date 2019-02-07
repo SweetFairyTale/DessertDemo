@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    //甜品元素类型枚举
     public enum SweetsType
     {
         EMPTY,
@@ -59,7 +58,7 @@ public class GameManager : MonoBehaviour
     private SweetsController targetSweet;
 
     public Text timeText;
-    private float gameTime = 10f;
+    private float gameTime = 60f;
     private bool gameOver = false;
 
     public int playerScore;
@@ -593,7 +592,7 @@ public class GameManager : MonoBehaviour
 
                         if (matchList.Count == 4)
                         {
-                            superSweets = (SweetsType)Random.Range((int)SweetsType.ROW_CLEAR, (int)SweetsType.COLUMN_CLEAR);
+                            superSweets = (SweetsType)Random.Range(3, 5);
                         }
 
                         //matchList.Count >= 5 ... Rainbow Sweets
